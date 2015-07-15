@@ -21,6 +21,8 @@ import java.util.List;
 
 public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
 
+    public static final String SEARCH_TYPE_ZIP = "search_zip";
+
     private final String LOG_TAG = FetchRepInfoTask.class.getSimpleName();
 
     private final String BASE_URL = "http://whoismyrepresentative.com/";
@@ -37,13 +39,24 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
+
+        String searchType = params[0];
+        String searchValue = params[1];
+
+        if (searchType.isEmpty() || searchValue.isEmpty()) {
+            return null;
+        }
+
         HttpURLConnection connection = null;
         BufferedReader reader = null;
-        
         String repsJsonString = null;
         
         try {
-            connection = (HttpURLConnection) getAllMembersSearchUrl().openConnection();
+
+            // Only one search type for now.
+            URL url = getAllMembersSearchUrl(searchValue);
+
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
             
@@ -116,13 +129,13 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
      * @return the url to retrieve all members for the stored zip code
      * @throws IOException if the url is malformed
      */
-    private URL getAllMembersSearchUrl() throws IOException {
+    private URL getAllMembersSearchUrl(String zipCode) throws IOException {
         final String PATH = "getall_mems.php";
         final String ZIP_PARAM = "zip";
         
         Uri uri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(PATH)
-                .appendQueryParameter(ZIP_PARAM, "84057")
+                .appendQueryParameter(ZIP_PARAM, zipCode)
                 .appendQueryParameter(OUTPUT_PARAM, OUTPUT_VALUE)
                 .build();
         

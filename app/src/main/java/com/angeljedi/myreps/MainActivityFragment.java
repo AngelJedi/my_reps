@@ -43,10 +43,14 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        loadReps();
+        loadReps(FetchRepInfoTask.SEARCH_TYPE_ZIP, Utility.getZipCode(getActivity()));
     }
 
-    private void loadReps() {
-        new FetchRepInfoTask(getActivity()).execute("");
+    private void loadReps(String searchType, String value) {
+        new FetchRepInfoTask(getActivity()).execute(searchType, value);
+    }
+
+    public void onZipChanged() {
+        loadReps(FetchRepInfoTask.SEARCH_TYPE_ZIP, Utility.getZipCode(getActivity()));
     }
 }

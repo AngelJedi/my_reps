@@ -1,5 +1,6 @@
 package com.angeljedi.myreps;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -7,8 +8,11 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String mZipCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mZipCode = Utility.getZipCode(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
@@ -30,9 +34,24 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String savedZipCode = Utility.getZipCode(this);
+        if (savedZipCode != null && !savedZipCode.equals(mZipCode)) {
+            MainActivityFragment fragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+            if (fragment != null) {
+                fragment.onZipChanged();
+            }
+        }
+        mZipCode = savedZipCode;
     }
 }
