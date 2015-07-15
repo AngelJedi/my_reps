@@ -5,6 +5,7 @@
     tools:context=".MainActivityFragment">
 
     <ListView
+        android:id="@+id/main_list_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
