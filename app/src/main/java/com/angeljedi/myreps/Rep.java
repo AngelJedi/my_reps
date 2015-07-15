@@ -1,6 +1,8 @@
 package com.angeljedi.myreps;
 
-public class Rep {
+import java.io.Serializable;
+
+public class Rep implements Serializable{
 
     private String name;
     private String party;

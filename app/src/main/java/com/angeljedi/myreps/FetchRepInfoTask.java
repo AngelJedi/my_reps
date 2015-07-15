@@ -81,7 +81,7 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void voidObject) {
-        RepAdapter adapter = new RepAdapter(mActivity, android.R.layout.simple_list_item_1, mRepList);
+        RepAdapter adapter = new RepAdapter(mActivity, R.layout.list_item_rep, mRepList);
         adapter.notifyDataSetChanged();
         ListView listView = (ListView) mActivity.findViewById(R.id.main_list_view);
         listView.setAdapter(adapter);
