@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -22,8 +23,18 @@ public class RepAdapter extends ArrayAdapter<Rep> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_rep, parent, false);
         }
 
-        TextView tvName = (TextView) convertView.findViewById(R.id.list_item_name);
-        tvName.setText(rep.getName());
+        int partyColor = Utility.getPartyColor(convertView.getContext(), rep.getParty());
+
+        ImageView partyView = (ImageView) convertView.findViewById(R.id.party_indicator);
+        Utility.setPartyColor(partyView, partyColor);
+
+        TextView nameView = (TextView) convertView.findViewById(R.id.list_item_name);
+        nameView.setText(rep.getName());
+
+        String subTitle = String.format(convertView.getContext().getString(R.string.format_list_item_subtitle), rep.getState(), rep.getDistrict());
+        TextView subtitle = (TextView) convertView.findViewById(R.id.list_item_subtitle);
+        subtitle.setText(subTitle);
+
         return convertView;
     }
 }
