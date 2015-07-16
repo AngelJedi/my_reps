@@ -17,4 +17,9 @@
     <style name="ActionBar.Solid.MyRep.NoTitle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="displayOptions">showHome|showTitle</item>
     </style>
+
+    <style name="RepListStyle">
+        <!-- Here it's a stub.  In screens of sufficient width, this style includes modifications
+        for two-pane layout -->
+    </style>
 </resources>

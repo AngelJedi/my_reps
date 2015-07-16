@@ -6,8 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainFragment.Callback {
 
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
+    private boolean mTwoPaneLayout;
     private String mZipCode;
 
     @Override
@@ -15,6 +18,19 @@ public class MainActivity extends AppCompatActivity {
         mZipCode = Utility.getZipCode(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (findViewById(R.id.rep_detail_container) != null) {
+            // two pane layout is present only in large-screen layouts (layout/sw-600dp)
+            mTwoPaneLayout = true;
+            // add the detail view to the activity when it is a two pane layout.
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.rep_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPaneLayout = false;
+        }
     }
 
 
@@ -47,11 +63,30 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         String savedZipCode = Utility.getZipCode(this);
         if (savedZipCode != null && !savedZipCode.equals(mZipCode)) {
-            MainActivityFragment fragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+            MainFragment fragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
             if (fragment != null) {
                 fragment.onZipChanged();
             }
         }
         mZipCode = savedZipCode;
+    }
+
+
+    @Override
+    public void onItemSelected(Rep rep) {
+        if (mTwoPaneLayout) {
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.EXTRA_REP, rep);
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.rep_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra(DetailFragment.EXTRA_REP, rep);
+            startActivity(intent);
+        }
     }
 }
