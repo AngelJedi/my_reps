@@ -1,8 +1,9 @@
 package com.angeljedi.myreps;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Rep implements Serializable{
+public class Rep implements Parcelable{
 
     private String name;
     private String party;
@@ -11,6 +12,9 @@ public class Rep implements Serializable{
     private String phone;
     private String office;
     private String website;
+
+    public Rep() {
+    }
 
     public String getDistrict() {
         return district;
@@ -66,5 +70,40 @@ public class Rep implements Serializable{
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(party);
+        dest.writeString(state);
+        dest.writeString(district);
+        dest.writeString(phone);
+        dest.writeString(office);
+        dest.writeString(website);
+    }
+
+    public static final Parcelable.Creator<Rep> CREATOR = new Parcelable.Creator<Rep> () {
+        public Rep createFromParcel(Parcel parcel) {
+            return new Rep(parcel);
+        }
+        public Rep[] newArray(int size) {
+            return new Rep[size];
+        }
+    };
+
+    public Rep(Parcel parcel) {
+        name = parcel.readString();
+        party = parcel.readString();
+        state = parcel.readString();
+        district = parcel.readString();
+        phone = parcel.readString();
+        office = parcel.readString();
+        website = parcel.readString();
     }
 }

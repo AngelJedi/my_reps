@@ -27,12 +27,8 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Rep rep = (Rep) parent.getItemAtPosition(position);
-
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(DetailActivityFragment.EXTRA_REP, rep);
-
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtras(bundle);
+                intent.putExtra(DetailActivityFragment.EXTRA_REP, rep);
                 startActivity(intent);
             }
         });

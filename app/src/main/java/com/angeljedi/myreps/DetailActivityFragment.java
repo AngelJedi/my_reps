@@ -23,7 +23,7 @@ public class DetailActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         Bundle bundle = getActivity().getIntent().getExtras();
-        Rep rep = (Rep) bundle.getSerializable(EXTRA_REP);
+        Rep rep = bundle.getParcelable(EXTRA_REP);
 
         if (rep != null) {
             TextView tvName = (TextView) view.findViewById(R.id.detail_name);
