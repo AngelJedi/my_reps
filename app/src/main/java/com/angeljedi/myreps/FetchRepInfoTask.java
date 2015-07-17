@@ -44,7 +44,7 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
         String searchType = params[0];
         String searchValue = params[1];
 
-        if (searchType.isEmpty() || searchValue.isEmpty()) {
+        if (searchType.isEmpty() || searchValue.isEmpty() || searchValue.equals(mActivity.getResources().getString(R.string.pref_zip_default))) {
             return null;
         }
 

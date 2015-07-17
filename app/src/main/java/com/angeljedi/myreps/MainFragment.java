@@ -1,11 +1,16 @@
 package com.angeljedi.myreps;
 
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -20,6 +25,7 @@ public class MainFragment extends Fragment {
     private RepAdapter mRepAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+    private String mZipCode;
 
     public MainFragment() {
     }
@@ -52,7 +58,14 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        loadReps(FetchRepInfoTask.SEARCH_TYPE_ZIP, Utility.getZipCode(getActivity()));
+
+        mZipCode = Utility.getZipCode(getActivity());
+        if (mZipCode.equals(getResources().getString(R.string.pref_zip_default))) {
+            showInputDialog();
+        } else {
+            loadReps(FetchRepInfoTask.SEARCH_TYPE_ZIP, mZipCode);
+        }
+
     }
 
     @Override
@@ -69,6 +82,42 @@ public class MainFragment extends Fragment {
 
     public void onZipChanged() {
         loadReps(FetchRepInfoTask.SEARCH_TYPE_ZIP, Utility.getZipCode(getActivity()));
+    }
+
+    protected void showInputDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.dialog_edit_text);
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        mZipCode = editText.getText().toString();
+                        updateZipPreference(mZipCode);
+                        loadReps(FetchRepInfoTask.SEARCH_TYPE_ZIP, mZipCode);
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
+    private void updateZipPreference(String zipCode) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(getResources().getString(R.string.pref_zip_key), zipCode);
+
+        editor.commit();
     }
 
     /**

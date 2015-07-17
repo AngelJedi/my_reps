@@ -11,11 +11,14 @@
     <!--Preference Strings-->
     <string name="pref_zip_label">Zip Code</string>
     <string name="pref_zip_key" translatable="false">zip</string>
-    <string name="pref_zip_default" translatable="false">84057</string>
+    <string name="pref_zip_default" translatable="false">Not Set</string>
 
     <!--Formatted String-->
     <string name="format_state">(<xliff:g id="party">%1$s</xliff:g>-<xliff:g id="state">%2$s</xliff:g>)</string>
     <string name="format_district">District: <xliff:g id="district">%1$s</xliff:g></string>
     <string name="format_list_item_subtitle"><xliff:g id="state">%1$s</xliff:g>, District: <xliff:g id="state">%2$s</xliff:g></string>
+
+    <!--Dialog Strings-->
+    <string name="dialog_instructions">Enter Zip Code</string>
 </resources>
 
