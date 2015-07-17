@@ -22,6 +22,7 @@ import java.util.List;
 public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
 
     public static final String SEARCH_TYPE_ZIP = "search_zip";
+    public static final String SEARCH_TYPE_STATE = "search_state";
 
     private final String LOG_TAG = FetchRepInfoTask.class.getSimpleName();
 
@@ -34,11 +35,11 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
 
     public FetchRepInfoTask(Activity mActivity) {
         this.mActivity = mActivity;
-        mRepList = new ArrayList<>();
     }
 
     @Override
     protected Void doInBackground(String... params) {
+        mRepList = new ArrayList<>();
 
         String searchType = params[0];
         String searchValue = params[1];
@@ -47,47 +48,7 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
             return null;
         }
 
-        HttpURLConnection connection = null;
-        BufferedReader reader = null;
-        String repsJsonString = null;
-        
-        try {
-
-            // Only one search type for now.
-            URL url = getAllMembersSearchUrl(searchValue);
-
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            
-            // Read the input stream into a String
-            InputStream stream = connection.getInputStream();
-            StringBuilder builder = new StringBuilder();
-            if (stream == null) {
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(stream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line).append("\n");
-            }
-
-            if (builder.length() == 0) {
-                return null;
-            }
-            repsJsonString = builder.toString();
-
-            JSONObject jsonObject = new JSONObject(repsJsonString);
-            getRepsFromJson(jsonObject);
-            
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error retrieving rep list", e);
-            e.printStackTrace();
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
+        populateRepListFromApi(searchType, searchValue);
 
         return null;
     }
@@ -98,6 +59,87 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
         adapter.notifyDataSetChanged();
         ListView listView = (ListView) mActivity.findViewById(R.id.main_list_view);
         listView.setAdapter(adapter);
+    }
+
+    /**
+     * Populates the list of reps based on the search type and search value
+     * @param searchType the type of search to perform through the api
+     * @param searchValue the value to use for the search (zip, state, or last name)
+     * @throws IOException
+     * @throws JSONException
+     */
+    private void populateRepListFromApi(String searchType, String searchValue) {
+
+
+        URL url;
+            switch (searchType) {
+                case SEARCH_TYPE_STATE: {
+                    break;
+                }
+                default: {
+                    url = getAllMembersSearchUrl(searchValue);
+                    callApi(url);
+                }
+            }
+
+    }
+
+    /**
+     * Makes a call to the api to retrieve a list of reps and populates them in the rep list
+     * @param url the url to use for the call
+     */
+    private void callApi(URL url) {
+        if (url == null) {
+            return;
+        }
+
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
+
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+
+            // Read the input stream into a String
+            InputStream stream = connection.getInputStream();
+            StringBuilder builder = new StringBuilder();
+            if (stream == null) {
+                return;
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line).append("\n");
+            }
+
+            if (builder.length() == 0) {
+                return;
+            }
+            String repsJsonString = builder.toString();
+
+            JSONObject jsonObject = new JSONObject(repsJsonString);
+            getRepsFromJson(jsonObject);
+
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error retrieving rep list", e);
+            e.printStackTrace();
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
+            }
+        }
     }
 
     /**
@@ -129,16 +171,22 @@ public class FetchRepInfoTask extends AsyncTask<String, Void, Void> {
      * @return the url to retrieve all members for the stored zip code
      * @throws IOException if the url is malformed
      */
-    private URL getAllMembersSearchUrl(String zipCode) throws IOException {
-        final String PATH = "getall_mems.php";
-        final String ZIP_PARAM = "zip";
-        
-        Uri uri = Uri.parse(BASE_URL).buildUpon()
-                .appendPath(PATH)
-                .appendQueryParameter(ZIP_PARAM, zipCode)
-                .appendQueryParameter(OUTPUT_PARAM, OUTPUT_VALUE)
-                .build();
-        
-        return new URL(uri.toString());
+    private URL getAllMembersSearchUrl(String zipCode) {
+        try {
+            final String PATH = "getall_mems.php";
+            final String ZIP_PARAM = "zip";
+
+            Uri uri = Uri.parse(BASE_URL).buildUpon()
+                    .appendPath(PATH)
+                    .appendQueryParameter(ZIP_PARAM, zipCode)
+                    .appendQueryParameter(OUTPUT_PARAM, OUTPUT_VALUE)
+                    .build();
+
+            return new URL(uri.toString());
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error retrieving rep list", e);
+            e.printStackTrace();
+        }
+        return null;
     }
 }
